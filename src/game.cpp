@@ -21,8 +21,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
             std::cout << "Window created successfully" << std::endl;
         
         renderer = SDL_CreateRenderer(window, -1, 0);
-        if(renderer)
+        if(renderer) {
+            SDL_SetRenderDrawColor(renderer, 100, 100, 255, 255);
             std::cout << "Renderer created successfully" << std::endl;
+        }
         
         is_running = true;
     } else {
@@ -31,7 +33,15 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 }
 
 void Game::handleEvents() {
-
+    SDL_Event event;
+    SDL_PollEvent(&event);
+    switch (event.type) {
+        case SDL_QUIT:
+            is_running = false;
+            break;
+        default:
+            break;
+    }
 }
 
 void Game::update() {
@@ -39,11 +49,16 @@ void Game::update() {
 }
 
 void Game::render() {
-
+    SDL_RenderClear(renderer);
+    // Add stuff to render here
+    SDL_RenderPresent(renderer);
 }
 
 void Game::clean() {
-
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();
+    std::cout << "Game cleared" << std::endl;
 }
 
 bool Game::running() {
