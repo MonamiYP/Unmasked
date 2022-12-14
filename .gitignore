@@ -35,3 +35,4 @@
 .vscode/*
 build/
 *.dSYM
+.DS_Store
