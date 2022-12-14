@@ -1,8 +1,9 @@
 #include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-int main() {
-    std::string greetings = "Hello";
-    std::cout << greetings << std::endl;
+int main(int argc, const char* argv[]) {
+    while(true) {
 
-    return EXIT_SUCCESS;
+    }
 }
