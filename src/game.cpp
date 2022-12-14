@@ -1,12 +1,11 @@
 #include "Game.hpp"
 
-Game::Game() {
+SDL_Texture* player_texture;
+SDL_Rect src_rect, des_rect;
 
-}
+Game::Game() {}
 
-Game::~Game() {
-
-}
+Game::~Game() {}
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height, bool full_screen) {
     int flags = 0;
@@ -22,14 +21,16 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         
         renderer = SDL_CreateRenderer(window, -1, 0);
         if(renderer) {
-            SDL_SetRenderDrawColor(renderer, 100, 100, 255, 255);
+            SDL_SetRenderDrawColor(renderer, 50, 50, 100, 255);
             std::cout << "Renderer created successfully" << std::endl;
         }
         
         is_running = true;
-    } else {
-        is_running = false;
     }
+
+    SDL_Surface* temp_surface = IMG_Load("assets/player.png");
+    player_texture = SDL_CreateTextureFromSurface(renderer, temp_surface);
+    SDL_FreeSurface(temp_surface);
 }
 
 void Game::handleEvents() {
@@ -45,12 +46,14 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-
+    des_rect.h = 64;
+    des_rect.w = 64;
 }
 
 void Game::render() {
     SDL_RenderClear(renderer);
     // Add stuff to render here
+    SDL_RenderCopy(renderer, player_texture, NULL, &des_rect);
     SDL_RenderPresent(renderer);
 }
 
