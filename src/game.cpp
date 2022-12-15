@@ -1,14 +1,19 @@
 #include "Game.hpp"
+#include "TextureManager.hpp"
+#include "GameObject.hpp"
+#include "Map.hpp"
 
-Game::Game() {
+GameObject* player;
+GameObject* enemy;
+Map* map;
 
-}
+SDL_Renderer* Game::renderer = nullptr;
 
-Game::~Game() {
+Game::Game() {}
+ 
+Game::~Game() {}
 
-}
-
-void Game::init(const char* title, int xpos, int ypos, int width, int height, bool full_screen) {
+void Game::init(const char* title, int width, int height, bool full_screen) {
     int flags = 0;
     if(full_screen)
         flags = SDL_WINDOW_FULLSCREEN;
@@ -16,20 +21,22 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         std::cout << "SDL_Init successful" << std::endl;
 
-        window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
         if(window)
             std::cout << "Window created successfully" << std::endl;
         
         renderer = SDL_CreateRenderer(window, -1, 0);
         if(renderer) {
-            SDL_SetRenderDrawColor(renderer, 100, 100, 255, 255);
+            SDL_SetRenderDrawColor(renderer, 50, 50, 100, 255);
             std::cout << "Renderer created successfully" << std::endl;
         }
         
         is_running = true;
-    } else {
-        is_running = false;
     }
+
+    player = new GameObject("assets/player.png", 0, 0);
+    enemy = new GameObject("assets/enemy.png", 50, 50);
+    map = new Map();
 }
 
 void Game::handleEvents() {
@@ -45,12 +52,17 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-
+    player->update();
+    enemy->update();
 }
 
 void Game::render() {
     SDL_RenderClear(renderer);
-    // Add stuff to render here
+
+    map->drawMap();
+    player->render();
+    enemy->render();
+
     SDL_RenderPresent(renderer);
 }
 

@@ -8,17 +8,17 @@ class Game {
         Game();
         ~Game();
 
-        void init(const char* title, int xpos, int ypos, int width, int height, bool full_screen);
+        void init(const char* title, int width, int height, bool full_screen);
         
         void handleEvents();
         void update();
+        bool running();
         void render();
         void clean();
 
-        bool running();
+        static SDL_Renderer* renderer;
 
     private:
         bool is_running;
         SDL_Window* window;
-        SDL_Renderer* renderer;
 };
