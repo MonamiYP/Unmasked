@@ -10,7 +10,7 @@ int main(int argc, const char* argv[]) {
     int frame_time;
 
     game = new Game();
-    game->init("Unmasked", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+    game->init("Unmasked", 800, 640, false);
 
     while(game->running()) {
         frame_start = SDL_GetTicks();

@@ -1,15 +1,19 @@
 #include "Game.hpp"
 #include "TextureManager.hpp"
 #include "GameObject.hpp"
+#include "Map.hpp"
 
 GameObject* player;
 GameObject* enemy;
+Map* map;
+
+SDL_Renderer* Game::renderer = nullptr;
 
 Game::Game() {}
-
+ 
 Game::~Game() {}
 
-void Game::init(const char* title, int x_pos, int y_pos, int width, int height, bool full_screen) {
+void Game::init(const char* title, int width, int height, bool full_screen) {
     int flags = 0;
     if(full_screen)
         flags = SDL_WINDOW_FULLSCREEN;
@@ -17,7 +21,7 @@ void Game::init(const char* title, int x_pos, int y_pos, int width, int height, 
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         std::cout << "SDL_Init successful" << std::endl;
 
-        window = SDL_CreateWindow(title, x_pos, y_pos, width, height, flags);
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
         if(window)
             std::cout << "Window created successfully" << std::endl;
         
@@ -30,8 +34,9 @@ void Game::init(const char* title, int x_pos, int y_pos, int width, int height, 
         is_running = true;
     }
 
-    player = new GameObject("assets/player.png", renderer, 0, 0);
-    enemy = new GameObject("assets/enemy.png", renderer, 50, 50);
+    player = new GameObject("assets/player.png", 0, 0);
+    enemy = new GameObject("assets/enemy.png", 50, 50);
+    map = new Map();
 }
 
 void Game::handleEvents() {
@@ -53,8 +58,11 @@ void Game::update() {
 
 void Game::render() {
     SDL_RenderClear(renderer);
+
+    map->drawMap();
     player->render();
     enemy->render();
+
     SDL_RenderPresent(renderer);
 }
 
