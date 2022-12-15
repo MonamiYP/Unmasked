@@ -1,14 +1,15 @@
 #include "Game.hpp"
 #include "TextureManager.hpp"
+#include "GameObject.hpp"
 
-SDL_Texture* player_texture;
-SDL_Rect src_rect, des_rect;
+GameObject* player;
+GameObject* enemy;
 
 Game::Game() {}
 
 Game::~Game() {}
 
-void Game::init(const char* title, int xpos, int ypos, int width, int height, bool full_screen) {
+void Game::init(const char* title, int x_pos, int y_pos, int width, int height, bool full_screen) {
     int flags = 0;
     if(full_screen)
         flags = SDL_WINDOW_FULLSCREEN;
@@ -16,7 +17,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         std::cout << "SDL_Init successful" << std::endl;
 
-        window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+        window = SDL_CreateWindow(title, x_pos, y_pos, width, height, flags);
         if(window)
             std::cout << "Window created successfully" << std::endl;
         
@@ -29,7 +30,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         is_running = true;
     }
 
-    player_texture = TextureManager::loadTexture("assets/player.png", renderer);
+    player = new GameObject("assets/player.png", renderer, 0, 0);
+    enemy = new GameObject("assets/enemy.png", renderer, 50, 50);
 }
 
 void Game::handleEvents() {
@@ -45,14 +47,14 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    des_rect.h = 64;
-    des_rect.w = 64;
+    player->update();
+    enemy->update();
 }
 
 void Game::render() {
     SDL_RenderClear(renderer);
-    // Add stuff to render here
-    SDL_RenderCopy(renderer, player_texture, NULL, &des_rect);
+    player->render();
+    enemy->render();
     SDL_RenderPresent(renderer);
 }
 
