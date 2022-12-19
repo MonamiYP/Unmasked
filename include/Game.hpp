@@ -17,6 +17,7 @@ class Game {
         void clean();
 
         static SDL_Renderer* renderer;
+        static SDL_Event event;
 
     private:
         bool is_running;

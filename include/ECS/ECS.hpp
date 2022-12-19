@@ -15,7 +15,7 @@ class Entity;
 class Component;
 
 // Each component type has its own ID
-// The Signature stores the compo
+// The signature stores the components an entity has, e.g 0,0,1,0,1 where 1 means it has the component with that ID
 using ComponentID = std::size_t;
 const std::size_t MAX_COMPONENTS = 32;
 using Signature = std::bitset<MAX_COMPONENTS>;
@@ -28,7 +28,8 @@ inline ComponentID getComponentID() {
 
 template <typename T>
 inline ComponentID getComponentID() noexcept {
-    // Will be on one begin with, then follow last_ID which is being incremented everytime this is called
+    // Creating a component will call getComponentID() which returns the latest ID and then increases ID for any future components
+    // When calling getComponentID() from a component that had already been created just returns the ID of the component
     static ComponentID type_ID = getComponentID();
     return type_ID;
 }

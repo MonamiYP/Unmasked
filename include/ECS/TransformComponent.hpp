@@ -5,6 +5,8 @@
 class TransformComponent : public Component {
     public:
         Vector2D position;
+        Vector2D velocity;
+        float speed = 3.0f;
 
         TransformComponent() {
             position.x = 0.0f;
@@ -15,7 +17,13 @@ class TransformComponent : public Component {
             position.y = y;
         }
 
+        void init() override {
+            velocity.x = 0;
+            velocity.y = 0;
+        }
+
         void update() override {
-            
+            position.x += velocity.x * speed;
+            position.y += velocity.y * speed;
         }
 };
