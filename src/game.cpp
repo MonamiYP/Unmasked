@@ -1,17 +1,15 @@
 #include "Game.hpp"
 #include "TextureManager.hpp"
-#include "GameObject.hpp"
 #include "Map.hpp"
-#include "ECS.hpp"
-#include "Components.hpp"
+#include "ECS/ECS.hpp"
+#include "ECS/Components.hpp"
+#include "Vector2D.hpp"
 
-GameObject* player;
-GameObject* enemy;
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
-auto& newPlayer(manager.addEntity());
+auto& player(manager.addEntity());
 
 Game::Game() {}
  
@@ -38,10 +36,10 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
         is_running = true;
     }
 
-    player = new GameObject("assets/player.png", 0, 0);
-    enemy = new GameObject("assets/enemy.png", 50, 50);
     map = new Map();
-    newPlayer.addComponent<PositionComponent>();
+    
+    player.addComponent<TransformComponent>();
+    player.addComponent<SpriteComponent>("assets/player.png");
 }
 
 void Game::handleEvents() {
@@ -57,17 +55,20 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    player->update();
-    enemy->update();
+    manager.refresh();
     manager.update();
+
+    player.getComponent<TransformComponent>().position += Vector2D(1, 4);
+    if(player.getComponent<TransformComponent>().position.x > 100) {
+        player.getComponent<SpriteComponent>().setTexture("assets/enemy.png");
+    }
 }
 
 void Game::render() {
     SDL_RenderClear(renderer);
 
     map->drawMap();
-    player->render();
-    enemy->render();
+    manager.draw();
 
     SDL_RenderPresent(renderer);
 }
