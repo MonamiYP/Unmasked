@@ -4,6 +4,7 @@
 #include "ECS/ECS.hpp"
 #include "ECS/Components.hpp"
 #include "Vector2D.hpp"
+#include "Collision.hpp"
 
 Map* map;
 
@@ -11,6 +12,8 @@ SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 Manager manager;
 auto& player(manager.addEntity());
+auto& enemy(manager.addEntity());
+auto& wall(manager.addEntity());
 
 Game::Game() {}
  
@@ -39,9 +42,17 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
 
     map = new Map();
     
-    player.addComponent<TransformComponent>();
+    player.addComponent<TransformComponent>(2);
     player.addComponent<SpriteComponent>("assets/player.png");
     player.addComponent<InputController>();
+    player.addComponent<ColliderComponent>("player");
+
+    enemy.addComponent<TransformComponent>(100.0f, 100.0f, 32, 32, 2);
+    enemy.addComponent<SpriteComponent>("assets/enemy.png");
+
+    wall.addComponent<TransformComponent>(300.0f, 300.0f, 300, 20, 1);
+    wall.addComponent<SpriteComponent>("assets/dirt.png");
+    wall.addComponent<ColliderComponent>("wall");
 }
 
 void Game::handleEvents() {
@@ -56,8 +67,14 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
+    Vector2D player_pos = player.getComponent<TransformComponent>().position;
     manager.refresh();
     manager.update();
+
+    if(Collision::AABB(player.getComponent<ColliderComponent>().collider,
+    wall.getComponent<ColliderComponent>().collider)) {
+        player.getComponent<TransformComponent>().position = player_pos;
+    }
 }
 
 void Game::render() {
