@@ -2,6 +2,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include <vector>
+
+class ColliderComponent;
 
 class Game {
     public:
@@ -16,8 +19,10 @@ class Game {
         void render();
         void clean();
 
+        static void addTile(int x, int y, int id);
         static SDL_Renderer* renderer;
         static SDL_Event event;
+        static std::vector<ColliderComponent*> colliders;
 
     private:
         bool is_running;

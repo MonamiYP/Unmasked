@@ -1,6 +1,5 @@
 #pragma once
 #include "../Game.hpp"
-#include "ECS/ECS.hpp"
 #include "Components.hpp"
 
 class InputController : public Component {

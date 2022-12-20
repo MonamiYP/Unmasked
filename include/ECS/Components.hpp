@@ -4,3 +4,4 @@
 #include "SpriteComponent.hpp"
 #include "InputController.hpp"
 #include "ColliderComponent.hpp"
+#include "TileComponent.hpp"

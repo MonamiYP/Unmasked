@@ -6,11 +6,14 @@
 #include "Vector2D.hpp"
 #include "Collision.hpp"
 
+Manager manager;
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
-Manager manager;
+
+std::vector<ColliderComponent*> Game::colliders;
+
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
 auto& wall(manager.addEntity());
@@ -41,7 +44,8 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     }
 
     map = new Map();
-    
+    Map::loadMap("assets/p20x20.map", 20, 20);
+
     player.addComponent<TransformComponent>(2);
     player.addComponent<SpriteComponent>("assets/player.png");
     player.addComponent<InputController>();
@@ -67,20 +71,18 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    Vector2D player_pos = player.getComponent<TransformComponent>().position;
+    //Vector2D player_pos = player.getComponent<TransformComponent>().position;
     manager.refresh();
     manager.update();
 
-    if(Collision::AABB(player.getComponent<ColliderComponent>().collider,
-    wall.getComponent<ColliderComponent>().collider)) {
-        player.getComponent<TransformComponent>().position = player_pos;
+    for (auto c : colliders) {
+        Collision::AABB(player.getComponent<ColliderComponent>(), *c);
+        //player.getComponent<TransformComponent>().position = player_pos;
     }
 }
 
 void Game::render() {
     SDL_RenderClear(renderer);
-
-    map->drawMap();
     manager.draw();
 
     SDL_RenderPresent(renderer);
@@ -95,4 +97,9 @@ void Game::clean() {
 
 bool Game::running() {
     return is_running;
+}
+
+void Game::addTile(int x, int y, int id) {
+    Entity& tile(manager.addEntity());
+    tile.addComponent<TileComponent>(x, y, 32, 32, id);
 }
