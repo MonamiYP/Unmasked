@@ -1,7 +1,6 @@
 #include "Game.hpp"
 #include "TextureManager.hpp"
 #include "Map.hpp"
-#include "ECS/ECS.hpp"
 #include "ECS/Components.hpp"
 #include "Vector2D.hpp"
 #include "Collision.hpp"
@@ -17,6 +16,13 @@ std::vector<ColliderComponent*> Game::colliders;
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
 auto& wall(manager.addEntity());
+
+enum group_labels : std::size_t {
+    group_map,
+    group_player,
+    group_enemy,
+    group_collider
+};
 
 Game::Game() {}
  
@@ -50,13 +56,16 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     player.addComponent<SpriteComponent>("assets/player.png");
     player.addComponent<InputController>();
     player.addComponent<ColliderComponent>("player");
+    player.addGroup(group_player);
 
     enemy.addComponent<TransformComponent>(100.0f, 100.0f, 32, 32, 2);
     enemy.addComponent<SpriteComponent>("assets/enemy.png");
+    enemy.addGroup(group_enemy);
 
     wall.addComponent<TransformComponent>(300.0f, 300.0f, 300, 20, 1);
     wall.addComponent<SpriteComponent>("assets/dirt.png");
     wall.addComponent<ColliderComponent>("wall");
+    wall.addGroup(group_map);
 }
 
 void Game::handleEvents() {
@@ -81,9 +90,25 @@ void Game::update() {
     }
 }
 
+auto& tiles(manager.getGroup(group_map));
+auto& players(manager.getGroup(group_player));
+auto& enemies(manager.getGroup(group_enemy));
+auto& colliders(manager.getGroup(group_collider));
+
 void Game::render() {
     SDL_RenderClear(renderer);
-    manager.draw();
+    for (auto& e : tiles) {
+        e->draw();
+    }
+    for (auto& e : players) {
+        e->draw();
+    }
+    for (auto& e : enemies) {
+        e->draw();
+    }
+    for (auto& e : colliders) {
+        e->draw();
+    }
 
     SDL_RenderPresent(renderer);
 }
@@ -102,4 +127,5 @@ bool Game::running() {
 void Game::addTile(int x, int y, int id) {
     Entity& tile(manager.addEntity());
     tile.addComponent<TileComponent>(x, y, 32, 32, id);
+    tile.addGroup(group_map);
 }
