@@ -35,7 +35,7 @@ class SpriteComponent : public Component {
             animations.emplace("walk", walk);
             animations.emplace("wiggle", wiggle);
 
-            play("idle");
+            play("wiggle");
 
             setTexture(sprite_path);
         }

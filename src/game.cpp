@@ -18,6 +18,8 @@ auto& enemy(manager.addEntity());
 auto& woerm(manager.addEntity());
 auto& wall(manager.addEntity());
 
+const char* map_file = "assets/basic_tilemap.png";
+
 enum group_labels : std::size_t {
     group_map,
     group_player,
@@ -51,7 +53,7 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     }
 
     map = new Map();
-    Map::loadMap("assets/p20x20.map", 20, 20);
+    Map::loadMap("assets/p28x20.map", 28, 20);
 
     player.addComponent<TransformComponent>(2);
     player.addComponent<SpriteComponent>("assets/player.png", true);
@@ -129,8 +131,8 @@ bool Game::running() {
     return is_running;
 }
 
-void Game::addTile(int x, int y, int id) {
+void Game::addTile(int src_x, int src_y, int x_pos, int y_pos) {
     Entity& tile(manager.addEntity());
-    tile.addComponent<TileComponent>(x, y, 32, 32, id);
+    tile.addComponent<TileComponent>(src_x, src_y, x_pos, y_pos, map_file);
     tile.addGroup(group_map);
 }

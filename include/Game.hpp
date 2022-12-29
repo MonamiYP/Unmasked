@@ -19,7 +19,7 @@ class Game {
         void render();
         void clean();
 
-        static void addTile(int x, int y, int id);
+        static void addTile(int src_x, int src_y, int x_pos, int y_pos);
         static SDL_Renderer* renderer;
         static SDL_Event event;
         static std::vector<ColliderComponent*> colliders;
