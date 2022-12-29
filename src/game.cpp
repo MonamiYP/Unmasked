@@ -15,6 +15,7 @@ std::vector<ColliderComponent*> Game::colliders;
 
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
+auto& woerm(manager.addEntity());
 auto& wall(manager.addEntity());
 
 enum group_labels : std::size_t {
@@ -53,7 +54,7 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     Map::loadMap("assets/p20x20.map", 20, 20);
 
     player.addComponent<TransformComponent>(2);
-    player.addComponent<SpriteComponent>("assets/player.png");
+    player.addComponent<SpriteComponent>("assets/player.png", true);
     player.addComponent<InputController>();
     player.addComponent<ColliderComponent>("player");
     player.addGroup(group_player);
@@ -61,6 +62,10 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     enemy.addComponent<TransformComponent>(100.0f, 100.0f, 32, 32, 2);
     enemy.addComponent<SpriteComponent>("assets/enemy.png");
     enemy.addGroup(group_enemy);
+
+    woerm.addComponent<TransformComponent>(350.0f, 200.0f, 32, 32, 2);
+    woerm.addComponent<SpriteComponent>("assets/woerm.png", true);
+    woerm.addGroup(group_enemy);
 
     wall.addComponent<TransformComponent>(300.0f, 300.0f, 300, 20, 1);
     wall.addComponent<SpriteComponent>("assets/dirt.png");
