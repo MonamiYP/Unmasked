@@ -5,8 +5,8 @@
 
 extern Manager manager;
 
-Map::Map(const char* m_file_path) 
-: file_path(m_file_path) {}
+Map::Map(std::string id) 
+: texture_id(id) {}
 
 Map::~Map() {
 }
@@ -48,6 +48,6 @@ void Map::loadMap(std::string path, int size_x, int size_y) {
 
 void Map::addTile(int src_x, int src_y, int x_pos, int y_pos) {
     Entity& tile(manager.addEntity());
-    tile.addComponent<TileComponent>(src_x, src_y, x_pos, y_pos, file_path);
+    tile.addComponent<TileComponent>(src_x, src_y, x_pos, y_pos, texture_id);
     tile.addGroup(Game::group_map);
 }

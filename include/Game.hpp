@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+class AssetManager;
 class ColliderComponent;
 
 class Game {
@@ -22,6 +23,7 @@ class Game {
         static SDL_Renderer* renderer;
         static SDL_Event event;
         static SDL_Rect camera;
+        static AssetManager* assets;
 
         enum group_labels : std::size_t {
             group_map,

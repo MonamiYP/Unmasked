@@ -3,12 +3,12 @@
 
 class Map {
     public:
-        Map(const char* m_file_path);
+        Map(std::string id);
         ~Map();
 
         void addTile(int src_x, int src_y, int x_pos, int y_pos);
         void loadMap(std::string path, int size_x, int size_y);
 
     private:
-        const char* file_path;
+        std::string texture_id;
 };

@@ -30,7 +30,7 @@ class ColliderComponent : public Component {
             }
             transform = &entity->getComponent<TransformComponent>();
 
-            texture = TextureManager::loadTexture("assets/collider_box.png");
+            texture = TextureManager::loadTexture("assets/collision_box.png");
             src_rect = { 0,0,32,32 };
             dst_rect = { collider.x, collider.y, collider.w, collider.h };
         }

@@ -11,6 +11,7 @@
 #include "../TextureManager.hpp"
 #include "Animation.hpp"
 #include <map>
+#include "AssetManager.hpp"
 
 class SpriteComponent : public Component {
     public:
@@ -21,10 +22,10 @@ class SpriteComponent : public Component {
         SDL_RendererFlip sprite_flip = SDL_FLIP_NONE;
 
         SpriteComponent() = default;
-        SpriteComponent(const char* sprite_path) {
-            setTexture(sprite_path);
+        SpriteComponent(std::string id) {
+            setTexture(id);
         }
-        SpriteComponent(const char* sprite_path, bool is_animated) {
+        SpriteComponent(std::string id, bool is_animated) {
             animated = is_animated;
 
             Animation idle = Animation(0, 1, 100);
@@ -37,13 +38,11 @@ class SpriteComponent : public Component {
 
             play("wiggle");
 
-            setTexture(sprite_path);
+            setTexture(id);
         }
-        ~SpriteComponent() {
-            SDL_DestroyTexture(texture);
-        }
-        void setTexture(const char* sprite_path) {
-            texture = TextureManager::loadTexture(sprite_path);
+        ~SpriteComponent() {}
+        void setTexture(std::string id) {
+            texture = Game::assets->getTexture(id);
         }
         void init() override {
             transform = &entity->getComponent<TransformComponent>();

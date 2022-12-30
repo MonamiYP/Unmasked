@@ -4,6 +4,7 @@
 #include "ECS/Components.hpp"
 #include "Vector2D.hpp"
 #include "Collision.hpp"
+#include "AssetManager.hpp"
 
 Manager manager;
 Map* map;
@@ -12,6 +13,8 @@ SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 
 SDL_Rect Game::camera = { 0,0,800,640 };
+
+AssetManager* Game::assets = new AssetManager(&manager);
 
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
@@ -35,28 +38,32 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
         
         renderer = SDL_CreateRenderer(window, -1, 0);
         if(renderer) {
-            SDL_SetRenderDrawColor(renderer, 50, 50, 100, 255);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             std::cout << "Renderer created successfully" << std::endl;
         }
-        
         is_running = true;
     }
 
-    map = new Map("assets/basic_tilemap.png");
+    assets->addTexture("terrain", "assets/basic_tilemap.png");
+    assets->addTexture("player", "assets/player.png");
+    assets->addTexture("enemy", "assets/enemy.png");
+    assets->addTexture("woerm", "assets/woerm.png");
+
+    map = new Map("terrain");
     map->loadMap("assets/p28x20.map", 28, 20);
 
     player.addComponent<TransformComponent>(2);
-    player.addComponent<SpriteComponent>("assets/player.png", true);
+    player.addComponent<SpriteComponent>("player", true);
     player.addComponent<InputController>();
     player.addComponent<ColliderComponent>("player");
     player.addGroup(group_player);
 
     enemy.addComponent<TransformComponent>(100.0f, 100.0f, 32, 32, 2);
-    enemy.addComponent<SpriteComponent>("assets/enemy.png");
+    enemy.addComponent<SpriteComponent>("enemy");
     enemy.addGroup(group_enemy);
 
     woerm.addComponent<TransformComponent>(350.0f, 200.0f, 32, 32, 2);
-    woerm.addComponent<SpriteComponent>("assets/woerm.png", true);
+    woerm.addComponent<SpriteComponent>("woerm", true);
     woerm.addGroup(group_enemy);
 }
 
