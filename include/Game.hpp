@@ -19,11 +19,16 @@ class Game {
         void render();
         void clean();
 
-        static void addTile(int src_x, int src_y, int x_pos, int y_pos);
         static SDL_Renderer* renderer;
         static SDL_Event event;
-        static std::vector<ColliderComponent*> colliders;
         static SDL_Rect camera;
+
+        enum group_labels : std::size_t {
+            group_map,
+            group_player,
+            group_enemy,
+            group_collider
+        };
 
     private:
         bool is_running;

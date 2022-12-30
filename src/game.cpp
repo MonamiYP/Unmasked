@@ -13,25 +13,9 @@ SDL_Event Game::event;
 
 SDL_Rect Game::camera = { 0,0,800,640 };
 
-std::vector<ColliderComponent*> Game::colliders;
-
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
 auto& woerm(manager.addEntity());
-
-const char* map_file = "assets/basic_tilemap.png";
-
-enum group_labels : std::size_t {
-    group_map,
-    group_player,
-    group_enemy,
-    group_collider
-};
-
-auto& tiles(manager.getGroup(group_map));
-auto& players(manager.getGroup(group_player));
-auto& enemies(manager.getGroup(group_enemy));
-auto& colliders(manager.getGroup(group_collider));
 
 Game::Game() {}
  
@@ -58,8 +42,8 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
         is_running = true;
     }
 
-    map = new Map();
-    Map::loadMap("assets/p28x20.map", 28, 20);
+    map = new Map("assets/basic_tilemap.png");
+    map->loadMap("assets/p28x20.map", 28, 20);
 
     player.addComponent<TransformComponent>(2);
     player.addComponent<SpriteComponent>("assets/player.png", true);
@@ -76,6 +60,11 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     woerm.addGroup(group_enemy);
 }
 
+auto& tiles(manager.getGroup(Game::group_map));
+auto& players(manager.getGroup(Game::group_player));
+auto& enemies(manager.getGroup(Game::group_enemy));
+auto& colliders(manager.getGroup(Game::group_collider));
+
 void Game::handleEvents() {
     SDL_PollEvent(&event);
     switch (event.type) {
@@ -88,8 +77,18 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
+    SDL_Rect player_collider = player.getComponent<ColliderComponent>().collider;
+    Vector2D player_position = player.getComponent<TransformComponent>().position;
+
     manager.refresh();
     manager.update();
+
+    for (auto& c : colliders) {
+        SDL_Rect collider = c->getComponent<ColliderComponent>().collider;
+        if(Collision::AABB(collider, player_collider)) {
+            player.getComponent<TransformComponent>().position = player_position;
+        }
+    }
 
     camera.x = player.getComponent<TransformComponent>().position.x - 400;
     camera.y = player.getComponent<TransformComponent>().position.y - 320;
@@ -127,10 +126,4 @@ void Game::clean() {
 
 bool Game::running() {
     return is_running;
-}
-
-void Game::addTile(int src_x, int src_y, int x_pos, int y_pos) {
-    Entity& tile(manager.addEntity());
-    tile.addComponent<TileComponent>(src_x, src_y, x_pos, y_pos, map_file);
-    tile.addGroup(group_map);
 }
