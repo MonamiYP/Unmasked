@@ -11,12 +11,13 @@ Map* map;
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 
+SDL_Rect Game::camera = { 0,0,800,640 };
+
 std::vector<ColliderComponent*> Game::colliders;
 
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
 auto& woerm(manager.addEntity());
-auto& wall(manager.addEntity());
 
 const char* map_file = "assets/basic_tilemap.png";
 
@@ -26,6 +27,11 @@ enum group_labels : std::size_t {
     group_enemy,
     group_collider
 };
+
+auto& tiles(manager.getGroup(group_map));
+auto& players(manager.getGroup(group_player));
+auto& enemies(manager.getGroup(group_enemy));
+auto& colliders(manager.getGroup(group_collider));
 
 Game::Game() {}
  
@@ -68,11 +74,6 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
     woerm.addComponent<TransformComponent>(350.0f, 200.0f, 32, 32, 2);
     woerm.addComponent<SpriteComponent>("assets/woerm.png", true);
     woerm.addGroup(group_enemy);
-
-    wall.addComponent<TransformComponent>(300.0f, 300.0f, 300, 20, 1);
-    wall.addComponent<SpriteComponent>("assets/dirt.png");
-    wall.addComponent<ColliderComponent>("wall");
-    wall.addGroup(group_map);
 }
 
 void Game::handleEvents() {
@@ -87,20 +88,17 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    //Vector2D player_pos = player.getComponent<TransformComponent>().position;
     manager.refresh();
     manager.update();
 
-    for (auto c : colliders) {
-        Collision::AABB(player.getComponent<ColliderComponent>(), *c);
-        //player.getComponent<TransformComponent>().position = player_pos;
-    }
-}
+    camera.x = player.getComponent<TransformComponent>().position.x - 400;
+    camera.y = player.getComponent<TransformComponent>().position.y - 320;
 
-auto& tiles(manager.getGroup(group_map));
-auto& players(manager.getGroup(group_player));
-auto& enemies(manager.getGroup(group_enemy));
-auto& colliders(manager.getGroup(group_collider));
+    if(camera.x < 0) { camera.x = 0; }
+    if(camera.x < 0) { camera.y = 0; }
+    if(camera.x > camera.w) { camera.x = camera.w; }
+    if(camera.x > camera.h) { camera.y = camera.h; }
+}
 
 void Game::render() {
     SDL_RenderClear(renderer);

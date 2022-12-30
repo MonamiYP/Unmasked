@@ -57,8 +57,8 @@ class SpriteComponent : public Component {
             }
             src_rect.y = animation_index * transform->height;
 
-            dst_rect.x = static_cast<int>(transform->position.x);
-            dst_rect.y = static_cast<int>(transform->position.y);
+            dst_rect.x = static_cast<int>(transform->position.x) - Game::camera.x;
+            dst_rect.y = static_cast<int>(transform->position.y) - Game::camera.y;
             dst_rect.w = transform->width * transform->scale;
             dst_rect.h = transform->height * transform->scale;
         }
