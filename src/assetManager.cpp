@@ -1,7 +1,6 @@
 #include "AssetManager.hpp"
 
-AssetManager::AssetManager(Manager* m_manager) 
-: manager(m_manager) {}
+AssetManager::AssetManager() {}
 AssetManager::~AssetManager() {}
 
 void AssetManager::addTexture(std::string id, const char* path) {

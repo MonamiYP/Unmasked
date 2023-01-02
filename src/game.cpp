@@ -14,7 +14,7 @@ SDL_Event Game::event;
 
 SDL_Rect Game::camera = { 0,0,800,640 };
 
-AssetManager* Game::assets = new AssetManager(&manager);
+AssetManager* Game::assets = new AssetManager();
 
 auto& player(manager.addEntity());
 auto& enemy(manager.addEntity());
@@ -84,11 +84,12 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    SDL_Rect player_collider = player.getComponent<ColliderComponent>().collider;
     Vector2D player_position = player.getComponent<TransformComponent>().position;
 
     manager.refresh();
     manager.update();
+
+    SDL_Rect player_collider = player.getComponent<ColliderComponent>().collider;
 
     for (auto& c : colliders) {
         SDL_Rect collider = c->getComponent<ColliderComponent>().collider;
