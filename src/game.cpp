@@ -5,9 +5,7 @@
 #include "Vector2D.hpp"
 #include "Collision.hpp"
 #include "AssetManager.hpp"
-
-Manager manager;
-Map* map;
+#include "Game_states/GameState.hpp"
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
@@ -16,23 +14,19 @@ SDL_Rect Game::camera = { 0,0,800,640 };
 
 AssetManager* Game::assets = new AssetManager();
 
-auto& player(manager.addEntity());
-auto& enemy(manager.addEntity());
-auto& woerm(manager.addEntity());
-
 Game::Game() {}
  
 Game::~Game() {}
 
-void Game::init(const char* title, int width, int height, bool full_screen) {
+void Game::init(const char* title, int width, int height, bool m_fullscreen) {
     int flags = 0;
-    if(full_screen)
+    if(m_fullscreen)
         flags = SDL_WINDOW_FULLSCREEN;
 
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         std::cout << "SDL_Init successful" << std::endl;
 
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags | SDL_WINDOW_RESIZABLE);
         if(window)
             std::cout << "Window created successfully" << std::endl;
         
@@ -41,36 +35,10 @@ void Game::init(const char* title, int width, int height, bool full_screen) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             std::cout << "Renderer created successfully" << std::endl;
         }
+        fullscreen = m_fullscreen;
         is_running = true;
     }
-
-    assets->addTexture("terrain", "assets/basic_tilemap.png");
-    assets->addTexture("player", "assets/player.png");
-    assets->addTexture("enemy", "assets/enemy.png");
-    assets->addTexture("woerm", "assets/woerm.png");
-
-    map = new Map("terrain");
-    map->loadMap("assets/p28x20.map", 28, 20);
-
-    player.addComponent<TransformComponent>(2);
-    player.addComponent<SpriteComponent>("player", true);
-    player.addComponent<InputController>();
-    player.addComponent<ColliderComponent>("player");
-    player.addGroup(group_player);
-
-    enemy.addComponent<TransformComponent>(100.0f, 100.0f, 32, 32, 2);
-    enemy.addComponent<SpriteComponent>("enemy");
-    enemy.addGroup(group_enemy);
-
-    woerm.addComponent<TransformComponent>(350.0f, 200.0f, 32, 32, 2);
-    woerm.addComponent<SpriteComponent>("woerm", true);
-    woerm.addGroup(group_enemy);
 }
-
-auto& tiles(manager.getGroup(Game::group_map));
-auto& players(manager.getGroup(Game::group_player));
-auto& enemies(manager.getGroup(Game::group_enemy));
-auto& colliders(manager.getGroup(Game::group_collider));
 
 void Game::handleEvents() {
     SDL_PollEvent(&event);
@@ -81,51 +49,28 @@ void Game::handleEvents() {
         default:
             break;
     }
+    game_states.back()->handleEvents(this);
 }
 
 void Game::update() {
-    Vector2D player_position = player.getComponent<TransformComponent>().position;
-
-    manager.refresh();
-    manager.update();
-
-    SDL_Rect player_collider = player.getComponent<ColliderComponent>().collider;
-
-    for (auto& c : colliders) {
-        SDL_Rect collider = c->getComponent<ColliderComponent>().collider;
-        if(Collision::AABB(collider, player_collider)) {
-            player.getComponent<TransformComponent>().position = player_position;
-        }
-    }
-
-    camera.x = player.getComponent<TransformComponent>().position.x - 400;
-    camera.y = player.getComponent<TransformComponent>().position.y - 320;
-
-    if(camera.x < 0) { camera.x = 0; }
-    if(camera.x < 0) { camera.y = 0; }
-    if(camera.x > camera.w) { camera.x = camera.w; }
-    if(camera.x > camera.h) { camera.y = camera.h; }
+    game_states.back()->update(this);
 }
 
 void Game::render() {
-    SDL_RenderClear(renderer);
-    for (auto& e : tiles) {
-        e->draw();
-    }
-    for (auto& e : players) {
-        e->draw();
-    }
-    for (auto& e : enemies) {
-        e->draw();
-    }
-    for (auto& e : colliders) {
-        e->draw();
-    }
-
-    SDL_RenderPresent(renderer);
+    game_states.back()->render(this);
 }
 
 void Game::clean() {
+    // Cleanup all the states
+    while (!game_states.empty()){
+        game_states.back()->clean();
+        game_states.pop_back();
+    }
+
+    if (fullscreen) {
+        SDL_SetWindowSize(window, 640, 480);
+    }
+
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
@@ -134,4 +79,34 @@ void Game::clean() {
 
 bool Game::running() {
     return is_running;
+}
+
+void Game::changeState(GameState* game_state) {
+    if (!game_states.empty()) {
+        game_states.back()->clean();
+        game_states.pop_back();
+    }
+
+    game_states.push_back(game_state);
+    game_states.back()->init();
+}
+
+void Game::pushState(GameState* game_state) {
+    if (!game_states.empty()) {
+        game_states.back()->pause();
+    }
+
+    game_states.push_back(game_state);
+    game_states.back()->init();
+}
+
+void Game::popState() {
+    if (!game_states.empty()) {
+        game_states.back()->clean();
+        game_states.pop_back();
+    }
+
+    if (!game_states.empty()) {
+        game_states.back()->resume();
+    }
 }

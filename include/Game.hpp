@@ -6,6 +6,7 @@
 
 class AssetManager;
 class ColliderComponent;
+class GameState;
 
 class Game {
     public:
@@ -20,6 +21,10 @@ class Game {
         void render();
         void clean();
 
+        void changeState(GameState* game_state);
+        void pushState(GameState* game_state);
+        void popState();
+
         static SDL_Renderer* renderer;
         static SDL_Event event;
         static SDL_Rect camera;
@@ -33,6 +38,9 @@ class Game {
         };
 
     private:
+        std::vector<GameState*> game_states;
+
+        bool fullscreen;
         bool is_running;
         SDL_Window* window;
 };

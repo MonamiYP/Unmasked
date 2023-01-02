@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Game_states/PlayState.hpp"
 
 Game* game = nullptr;
 
@@ -11,6 +12,7 @@ int main(int argc, const char* argv[]) {
 
     game = new Game();
     game->init("Unmasked", 800, 640, false);
+    game->changeState(PlayState::instance());
 
     while(game->running()) {
         frame_start = SDL_GetTicks();
