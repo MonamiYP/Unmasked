@@ -2,6 +2,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include <vector>
+
+class AssetManager;
+class ColliderComponent;
 
 class Game {
     public:
@@ -17,6 +21,16 @@ class Game {
         void clean();
 
         static SDL_Renderer* renderer;
+        static SDL_Event event;
+        static SDL_Rect camera;
+        static AssetManager* assets;
+
+        enum group_labels : std::size_t {
+            group_map,
+            group_player,
+            group_enemy,
+            group_collider
+        };
 
     private:
         bool is_running;
