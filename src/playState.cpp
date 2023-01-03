@@ -38,6 +38,8 @@ void PlayState::init() {
     woerm.addComponent<TransformComponent>(350.0f, 200.0f, 32, 32, 2);
     woerm.addComponent<SpriteComponent>("woerm", true);
     woerm.addGroup(Game::group_enemy);
+
+    SDL_ShowCursor(SDL_DISABLE);
 }
 
 void PlayState::clean() {
@@ -49,7 +51,7 @@ void PlayState::pause() {
 }
 
 void PlayState::resume() {
-
+    SDL_ShowCursor(SDL_DISABLE);
 }
 
 auto& tiles(manager.getGroup(Game::group_map));

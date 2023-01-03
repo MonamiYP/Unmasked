@@ -5,10 +5,11 @@
 MenuState MenuState::menu_state;
 
 void MenuState::init() {
-    SDL_Surface* surface = IMG_Load("assets/pause_menu.bmp");
+    SDL_Surface* surface = IMG_Load("assets/pause_menu.png");
     texture = SDL_CreateTextureFromSurface(Game::renderer, surface);
 
 	SDL_FreeSurface(surface);
+    SDL_ShowCursor(SDL_ENABLE);
 }
 
 void MenuState::clean() {
